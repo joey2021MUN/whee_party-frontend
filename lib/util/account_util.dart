@@ -11,7 +11,8 @@ typedef BoolCallBack = void Function(bool value);
 class AccountUtil {
   static final _storage = LocalStorage("whee");
 
-  static String? getStoredToken() {
+  static Future<String?> getStoredToken() async {
+    await _storage.ready;
     return _storage.getItem("token");
   }
 
@@ -33,15 +34,23 @@ class AccountUtil {
   static void signOut(BuildContext context) {
     _storage.deleteItem("token");
     _storage.deleteItem("email");
-    Provider.of<AccountModel>(context).clearLoggingInInfo();
+    AccountModel.currentSessionToken = null;
+    Provider.of<AccountModel>(context, listen: false).clearLoggingInInfo();
   }
 
   static Future<dynamic> greetings() async {
     return NetUtil.request("GET", "/greetings", needAuthentication: true);
   }
 
-  static void tryAutoSignIn({ required BuildContext context, required BoolCallBack? completion, required showToast }) {
-    String? token = getStoredToken();
+  static void tryAutoSignIn({
+    required BuildContext context,
+    required BoolCallBack? completion,
+    required showToast,
+    String? tempToken,
+  }) async {
+    tempToken ??= AccountModel.currentSessionToken;
+
+    String? token = tempToken ?? await getStoredToken();
     if (token == null) {
       completion?.call(false);
       return;
@@ -60,8 +69,8 @@ class AccountUtil {
         );
       }
 
-      Provider.of<AccountModel>(context, listen: false)
-          .updateLoggingInInfo(true, result["email"], result["full_name"]);
+      var state = Provider.of<AccountModel>(context, listen: false);
+      state.updateLoggingInInfo(true, result["email"], result["full_name"]);
     }).catchError((_) {
       completion?.call(false);
       return;

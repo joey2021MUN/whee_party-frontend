@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import "package:intl/intl.dart";
+import 'package:provider/provider.dart';
+import 'package:whee_party/model/account_model.dart';
 import 'package:whee_party/model/slot_availability.dart';
+import 'package:whee_party/page/login_page.dart';
+import 'package:whee_party/util/account_util.dart';
 import 'package:whee_party/util/network_util.dart';
 import 'package:whee_party/util/ui_util.dart';
 import 'package:whee_party/widget/toggle_button.dart';
@@ -70,12 +74,18 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
   }
 
   void onBookPartyClicked() async {
+    if (!Provider.of<AccountModel>(context, listen: false).isSignedIn) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const LoginPage()));
+      return;
+    }
+
     UIUtil.showLoadingDialog(context, "Loading...");
 
     NetUtil.request("POST", "/order", body: {
       "date": widget.selectedDate.toIso8601String(),
-      "time_slot_id": _selectedSlotIdentifier
-    }).then((value) {
+      "time_slot_id": _selectedSlotIdentifier,
+    }, needAuthentication: true).then((value) {
       UIUtil.updateLoadingDialog(context, value["message"]);
       _refreshAvailabilities();
       setState(() {
@@ -101,6 +111,9 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
     var slot = _slots.where((s) => s.identifier == slotIdentifier);
     if (slot.isEmpty) {
       return "(Error)";
+    }
+    if (!slot.first.available && slot.first.reason != "") {
+      return slot.first.reason!;
     }
     return "${slot.first.startTime.format12()} - ${slot.first.endTime.format12()}";
   }
@@ -154,7 +167,9 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
               alignment: Alignment.center,
               child: Text(
                 getSlotDescription(slot.identifier),
-                style: TextStyle(color: slot.available ? Colors.black : Colors.grey),
+                style: TextStyle(
+                    fontSize: 16.0,
+                    color: slot.available ? Colors.black : Colors.grey),
               ),
             )))
         .toList();
@@ -179,7 +194,7 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
               ),
             ),
             SizedBox(
-              height: 200,
+              height: 220,
               child: GridView.count(
                 crossAxisCount: 2,
                 childAspectRatio: 4,
@@ -190,7 +205,7 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
             ),
             FilledButton(
               onPressed:
-              _selectedSlotIdentifier == -1 ? null : onBookPartyClicked,
+                  _selectedSlotIdentifier == -1 ? null : onBookPartyClicked,
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -200,7 +215,7 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              child: const Text("Book"),
+              child: const Text("Book", style: TextStyle(fontSize: 20.0)),
             ),
           ],
         ),

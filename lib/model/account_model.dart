@@ -9,10 +9,16 @@ class AccountModel extends ChangeNotifier {
   String get loggingInEmail => _loggingInEmail;
   String get loggingFullName => _loggingFullName;
 
-  void updateLoggingInInfo(bool isSignedIn, String email, String fullname) {
+  static String? currentSessionToken;
+
+  void updateLoggingInInfo(
+    bool isSignedIn,
+    String email,
+    String fullName,
+  ) {
     _isSignedIn = isSignedIn;
     _loggingInEmail = email;
-    _loggingFullName = fullname;
+    _loggingFullName = fullName;
     notifyListeners();
   }
 
@@ -20,5 +26,6 @@ class AccountModel extends ChangeNotifier {
     _isSignedIn = false;
     _loggingInEmail = "(N/A)";
     _loggingFullName = "Guest";
+    notifyListeners();
   }
 }

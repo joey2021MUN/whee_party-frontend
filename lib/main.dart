@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:whee_party/model/account_model.dart';
 import 'package:whee_party/page/home_page.dart';
 import 'package:whee_party/page/party_date_page.dart';
+import 'package:whee_party/page/profile_page.dart';
 import 'package:whee_party/page/router_page.dart';
-
 import 'model/navigation_model.dart';
 
 void main() {
@@ -37,7 +37,7 @@ class WheeParty extends StatelessWidget {
       label: "Profile",
       title: "Profile",
       icon: Icon(Icons.person_pin),
-      widget: Text("Profile"),
+      widget: ProfilePage(),
     ),
   ];
 

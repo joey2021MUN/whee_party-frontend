@@ -1,7 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:whee_party/model/account_model.dart';
 import 'package:whee_party/util/account_util.dart';
 import 'package:whee_party/util/ui_util.dart';
 
@@ -16,7 +16,6 @@ class _LoginPageState extends State<LoginPage> {
   String _errorTextEmail = "";
   String _errorTextPassword = "";
   bool _shouldShowErrorTextEmail = false;
-  bool _shouldShowErrorTextPassword = false;
   bool _shouldRememberMe = true;
   bool _isLoading = false;
   var emailController = TextEditingController(text: "123@gmail.com");
@@ -26,17 +25,11 @@ class _LoginPageState extends State<LoginPage> {
     var email = emailController.value.text;
     var password = passwordController.value.text;
 
-    if (email.isEmpty /* || password.isEmpty */) {
+    if (email.isEmpty) {
       if (email.isEmpty) {
         setState(() {
           _errorTextEmail = "Please enter a valid email address.";
           _shouldShowErrorTextEmail = true;
-        });
-      }
-      if (password.isEmpty) {
-        setState(() {
-          _errorTextPassword = "Please enter a valid password.";
-          _shouldShowErrorTextPassword = true;
         });
       }
       return;
@@ -69,17 +62,23 @@ class _LoginPageState extends State<LoginPage> {
         AccountUtil.setStoredToken(token);
       }
 
-      AccountUtil.setStoredToken(token);
-      AccountUtil.tryAutoSignIn(context: context, showToast: true, completion: null);
+      AccountModel.currentSessionToken = token;
+      AccountUtil.tryAutoSignIn(
+        context: context,
+        tempToken: token,
+        showToast: true,
+        completion: null,
+      );
       Navigator.pop(context);
-    }).catchError((_) {
-
-    });
+    }).catchError((_) {});
   }
 
-  void _onCreateAnAccountClicked() {
-
+  void _onContinueAsGuestClicked() {
+    Navigator.pop(context);
   }
+
+  // Todo
+  void _onCreateAnAccountClicked() {}
 
   void _onShouldRememberMeCheckBoxChanged(bool? newValue) {
     setState(() {
@@ -93,10 +92,6 @@ class _LoginPageState extends State<LoginPage> {
       _errorTextEmail,
       style: const TextStyle(color: Colors.redAccent),
     );
-    var errorTextPassword = Text(
-      _errorTextPassword,
-      style: const TextStyle(color: Colors.redAccent),
-    );
 
     return Material(
       child: Container(
@@ -104,15 +99,16 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 48),
+            const SizedBox(height: 40),
             const Spacer(flex: 1),
             Container(
               padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
               child: const Text(
-                "Log In",
+                "Welcome to\nWhee Indoor Playground",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 36,
+                  color: Colors.blueAccent,
+                  fontSize: 24,
                 ),
               ),
             ),
@@ -137,35 +133,11 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                     ),
                     controller: emailController,
                   ),
                   ...(_shouldShowErrorTextEmail ? [errorTextEmail] : []),
-                  /*
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                    child: const Text(
-                      "Password",
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                  CupertinoTextField(
-                    obscureText: true,
-                    placeholder: "Enter your password",
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    style: const TextStyle(
-                      fontSize: 20,
-                    ),
-                    controller: passwordController,
-                  ),
-                  ...(_shouldShowErrorTextPassword ? [errorTextPassword] : [])
-                   */
                 ],
               ),
             ),
@@ -206,31 +178,55 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const Text(
                     "Don't have an account?",
-                    style: TextStyle(color: Colors.grey, fontSize: 18),
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                    child: FilledButton(
-                      onPressed: _onCreateAnAccountClicked,
-                      style: const ButtonStyle(
-                        backgroundColor:
-                        MaterialStatePropertyAll<Color>(Colors.green),
-                      ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        margin: const EdgeInsets.fromLTRB(4, 4, 8, 4),
-                        child: const Text(
-                          "Create Account",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    child: Column(
+                      children: [
+                        FilledButton(
+                          onPressed: _onCreateAnAccountClicked,
+                          style: const ButtonStyle(
+                            backgroundColor:
+                                MaterialStatePropertyAll<Color>(Colors.green),
+                          ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: double.infinity,
+                            margin: const EdgeInsets.fromLTRB(4, 4, 8, 4),
+                            child: const Text(
+                              "Create Account",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        FilledButton(
+                          onPressed: _onContinueAsGuestClicked,
+                          style: const ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll<Color>(
+                                Colors.blueGrey),
+                          ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: double.infinity,
+                            margin: const EdgeInsets.fromLTRB(4, 4, 8, 4),
+                            child: const Text(
+                              "Continue as Guest",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

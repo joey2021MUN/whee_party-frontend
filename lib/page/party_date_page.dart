@@ -12,9 +12,10 @@ class PartyDatePage extends StatefulWidget {
 }
 
 class PartyDatePageState extends State<PartyDatePage> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
+  bool didUserSelectedDay = false;
 
-  void onTimeSlotClicked() {
+  void onNextClicked() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -26,16 +27,12 @@ class PartyDatePageState extends State<PartyDatePage> {
   }
 
   void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    var now = DateTime.now();
-    if (isBefore(selectedDay, now)) {
-      // Same day is still allowed to select.
-      if (!isSameDay(selectedDay, now)) {
-        return;
-      }
+    if (selectedDay.isAfter(DateTime.now())) {
+      setState(() {
+        didUserSelectedDay = true;
+        selectedDate = selectedDay;
+      });
     }
-    setState(() {
-      selectedDate = selectedDay;
-    });
   }
 
   bool isSameDay(DateTime x, DateTime y) {
@@ -43,7 +40,7 @@ class PartyDatePageState extends State<PartyDatePage> {
   }
 
   bool isBefore(DateTime x, DateTime y) {
-    return x.isBefore(y);
+    return !x.isAfter(y);
   }
 
   @override
@@ -61,38 +58,38 @@ class PartyDatePageState extends State<PartyDatePage> {
               return day.weekday == DateTime.sunday ||
                   day.weekday == DateTime.saturday;
             },
+            // weekends after current date are highlighted with red color.
             calendarBuilders: CalendarBuilders(
               holidayBuilder: (context, day, _) {
                 return Center(
                     child: Text(
-                      day.day.toString(),
-                      style: TextStyle(
-                        color: isBefore(day, DateTime.now())
-                            ? Colors.grey
-                            : Colors.red,
-                      ),
-                    ));
+                  day.day.toString(),
+                  style: TextStyle(
+                      color: day.isAfter(DateTime.now())
+                          ? Colors.red
+                          : Colors.grey),
+                ));
               },
+              // all dates before current date are grey and disabled.
               defaultBuilder: (context, day, _) {
                 return Center(
-                  child: isBefore(day, DateTime.now())
-                      ? Text(
-                    day.day.toString(),
-                    style: const TextStyle(color: Colors.grey),
-                  )
-                      : Text(day.day.toString()),
-                );
+                    child: day.isAfter(DateTime.now())
+                        ? Text(day.day.toString())
+                        : Text(
+                            day.day.toString(),
+                            style: const TextStyle(color: Colors.grey),
+                          ));
               },
             ),
             selectedDayPredicate: (day) {
-              return isSameDay(selectedDate, day);
+              return didUserSelectedDay && isSameDay(selectedDate, day);
             },
             onDaySelected: onDaySelected,
           ),
           ElevatedButton(
-              onPressed: onTimeSlotClicked,
+              onPressed: didUserSelectedDay ? onNextClicked : null,
               child: const Text(
-                'select a time slot',
+                'Next',
                 style: TextStyle(fontSize: 20.0),
               ))
         ],

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whee_party/model/navigation_model.dart';
 import 'package:whee_party/page/login_page.dart';
-import 'package:whee_party/page/party_date_page.dart';
 import 'package:whee_party/util/account_util.dart';
 import 'package:whee_party/util/network_util.dart';
 
@@ -10,6 +9,8 @@ import '../model/package.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  static bool didTryAutoLogin = false;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -37,15 +38,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void _tryAutoSignIn() {
-    AccountUtil.tryAutoSignIn(context: context, showToast: false, completion: (success) {
-      if (!success) {
-        Future(() {
-          Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => const LoginPage()))
-              .whenComplete(() => _refreshPackages());
-        });
-      }
-    });
+    AccountUtil.tryAutoSignIn(context: context, showToast: true, completion: null);
   }
 
   @override
@@ -58,16 +51,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    super.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _tryAutoSignIn();
-    _refreshPackages();
+
+    Future(() {
+      _refreshPackages();
+
+      if (!MyHomePage.didTryAutoLogin) {
+        _tryAutoSignIn();
+        MyHomePage.didTryAutoLogin = true;
+      }
+    });
   }
 
   Future<void> onBookPartyClicked() async {
@@ -86,8 +86,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             children: [
               Text('${package.name}   \$${package.price}+HST',
                   style: const TextStyle(color: Colors.white, fontSize: 20.0)),
-              // Text('package.price + HST',
-              //     style: const TextStyle(color: Colors.white, fontSize: 20.0)),
               Text(package.description,
                   style: const TextStyle(color: Colors.white, fontSize: 18.0)),
             ],

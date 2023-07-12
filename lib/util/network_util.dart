@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whee_party/model/account_model.dart';
 import 'package:whee_party/util/account_util.dart';
 
 import '../model/slot_availability.dart';
 
 class NetUtil {
-    //static const String host = "192.168.2.27";
-    static String host = "10.20.241.168";
+    //static const String host = "192.168.2.27"; // home
+    static String host = "10.20.241.168"; // school
 
   static Future<dynamic> request(String method, String path,
    { Map<String, dynamic>? body, bool needAuthentication = false }) async {
@@ -17,7 +18,9 @@ class NetUtil {
     var headers = {"Content-Type": "application/json"};
 
     if (needAuthentication) {
-      headers["Authorization"] = AccountUtil.getStoredToken() ?? "";
+      var token = AccountModel.currentSessionToken
+          ?? await AccountUtil.getStoredToken();
+      headers["Authorization"] = "Bearer $token" ?? "";
     }
 
     if (method.trim().toLowerCase() == "post") {
