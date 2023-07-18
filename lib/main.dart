@@ -19,7 +19,7 @@ void main() {
   );
 }
 
-class WheeParty extends StatelessWidget {
+class WheeParty extends StatefulWidget {
   final widgets = const [
     WidgetItem(
       label: "Home",
@@ -44,13 +44,18 @@ class WheeParty extends StatelessWidget {
   const WheeParty({super.key});
 
   @override
+  WheePartyState createState() => WheePartyState();
+}
+
+class WheePartyState extends State<WheeParty> {
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Whee Indoor Playground',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: RouterPage(widgetItems: widgets),
+      home: RouterPage(widgetItems: widget.widgets),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:whee_party/model/account_model.dart';
 import 'package:whee_party/util/hash_util.dart';
 import 'package:whee_party/util/network_util.dart';
+import 'package:whee_party/model/user.dart';
 
 typedef BoolCallBack = void Function(bool value);
 
@@ -69,8 +70,9 @@ class AccountUtil {
         );
       }
 
+      var user = User.fromJson(result["user"]);
       var state = Provider.of<AccountModel>(context, listen: false);
-      state.updateLoggingInInfo(true, result["email"], result["full_name"]);
+      state.updateLoggingInInfo(true, user);
     }).catchError((_) {
       completion?.call(false);
       return;

@@ -48,9 +48,7 @@ class _RouterPageState extends State<RouterPage> {
         currentIndex: currentIndex,
         onTap: _onItemTapped,
       ),
-      body: SingleChildScrollView(
-        child: widget.widgetItems[currentIndex].widget,
-      ),
+      body: widget.widgetItems[currentIndex].widget,
     );
   }
 }

@@ -1,31 +1,27 @@
 import 'package:flutter/foundation.dart';
+import 'package:whee_party/model/user.dart';
 
 class AccountModel extends ChangeNotifier {
   bool _isSignedIn = false;
-  String _loggingInEmail = "(N/A)";
-  String _loggingFullName = "Guest";
+  User? _currentUser;
 
   bool get isSignedIn => _isSignedIn;
-  String get loggingInEmail => _loggingInEmail;
-  String get loggingFullName => _loggingFullName;
+  User? get currentUser => _currentUser;
 
   static String? currentSessionToken;
 
   void updateLoggingInInfo(
     bool isSignedIn,
-    String email,
-    String fullName,
+    User? currentUser,
   ) {
     _isSignedIn = isSignedIn;
-    _loggingInEmail = email;
-    _loggingFullName = fullName;
+    _currentUser = currentUser;
     notifyListeners();
   }
 
   void clearLoggingInInfo() {
     _isSignedIn = false;
-    _loggingInEmail = "(N/A)";
-    _loggingFullName = "Guest";
+    _currentUser = null;
     notifyListeners();
   }
 }

@@ -12,7 +12,7 @@ class PartyDatePage extends StatefulWidget {
 }
 
 class PartyDatePageState extends State<PartyDatePage> {
-  DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
+  DateTime selectedDate = DateTime.now().add(const Duration(hours: 24));
   bool didUserSelectedDay = false;
 
   void onNextClicked() {
@@ -37,10 +37,6 @@ class PartyDatePageState extends State<PartyDatePage> {
 
   bool isSameDay(DateTime x, DateTime y) {
     return x.year == y.year && x.month == y.month && x.day == y.day;
-  }
-
-  bool isBefore(DateTime x, DateTime y) {
-    return !x.isAfter(y);
   }
 
   @override
@@ -70,7 +66,7 @@ class PartyDatePageState extends State<PartyDatePage> {
                           : Colors.grey),
                 ));
               },
-              // all dates before current date are grey and disabled.
+              // current date and dates before are grey and disabled.
               defaultBuilder: (context, day, _) {
                 return Center(
                     child: day.isAfter(DateTime.now())

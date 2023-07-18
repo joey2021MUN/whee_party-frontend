@@ -14,7 +14,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   String _errorTextEmail = "";
-  String _errorTextPassword = "";
   bool _shouldShowErrorTextEmail = false;
   bool _shouldRememberMe = true;
   bool _isLoading = false;
