@@ -77,6 +77,7 @@ class PartyDatePageState extends State<PartyDatePage> {
                           ));
               },
             ),
+            // Function deciding whether given day should be marked as selected.
             selectedDayPredicate: (day) {
               return didUserSelectedDay && isSameDay(selectedDate, day);
             },

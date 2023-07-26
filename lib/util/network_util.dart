@@ -10,7 +10,7 @@ import '../model/user.dart';
 
 class NetUtil {
   //static const String host = "192.168.2.27"; // home
-  static String host = "10.20.241.168"; // school
+  static String host = "10.20.5.39"; // school
 
   static Future<dynamic> request(String method, String path,
    { Map<String, dynamic>? body, bool needAuthentication = false }) async {
@@ -86,9 +86,10 @@ class NetUtil {
     }
   }
 
-  static Future<String> deleteOrder(int orderId) async {
+  static Future<String> cancelOrder(int orderId) async {
+    var body = {"order_id": orderId};
     var response = await NetUtil.request(
-        "DELETE", "/order/$orderId", needAuthentication: true);
+        "post", "/order/cancel", body: body, needAuthentication: true);
     return Future.value(response["message"]);
   }
 

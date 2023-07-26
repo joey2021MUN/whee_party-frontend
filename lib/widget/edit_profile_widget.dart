@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whee_party/model/account_model.dart';
-import 'package:whee_party/util/account_util.dart';
 import 'package:whee_party/util/network_util.dart';
-import 'package:whee_party/util/ui_util.dart';
+import 'package:whee_party/util/dialog_util.dart';
 
 class EditProfileWidget extends StatefulWidget {
   const EditProfileWidget({Key? key}) : super(key: key);
@@ -72,11 +71,16 @@ class EditProfileWidgetState extends State<EditProfileWidget> {
             user.setEmail(emailProperty.controller.text);
             user.setPhoneNumber(phoneNumberProperty.controller.text);
 
-            NetUtil.updateSelfUser(user).then((_) {
-              state.updateLoggingInInfo(true, user);
-              Navigator.of(context).pop();
+            NetUtil.updateSelfUser(user).then((response) {
+              if (response.toLowerCase().contains("success")) {
+                state.updateLoggingInInfo(true, user);
+                Navigator.of(context).pop();
+              }
+              else {
+                DialogUtil.alertDialog(context, response);
+              }
             }).catchError((error) {
-              UIUtil.alertDialog(context, error);
+              DialogUtil.alertDialog(context, error);
             });
           },
           child: const Text('Save'),

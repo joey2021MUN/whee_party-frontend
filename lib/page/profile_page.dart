@@ -2,11 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whee_party/model/account_model.dart';
-import 'package:whee_party/model/order.dart';
 import 'package:whee_party/page/login_page.dart';
-import 'package:whee_party/page/edit_profile_widget.dart';
+import 'package:whee_party/widget/edit_profile_widget.dart';
 import 'package:whee_party/util/account_util.dart';
-import 'package:whee_party/util/network_util.dart';
+import 'package:whee_party/widget/my_orders_dialog_content.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -37,68 +36,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void onSettings() {}
 
-  void onPay(Order order) {
-
-  }
-
-  void onCancel(Order order) {
-    NetUtil.deleteOrder(order.id);
-  }
-
   void onMyOrders() {
-    NetUtil.getOrderHistory().then((List<Order> orders) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("My Orders"),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: orders.length,
-              itemBuilder: (_, int index) {
-                var order = orders[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      title: Text("Order #${order.id}"),
-                      subtitle: Text(order.orderDate.toString().split(" ")[0]),
-                      trailing:
-                          Text(order.paymentId != null ? "Paid" : "Not Paid"),
-                    ),
-                    Card(
-                      elevation: 0,
-                      color: Colors.black12,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        width: double.maxFinite,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${order.packageName} (\$${order.packagePrice})"),
-                            Text("Time Slot: ${order.timeSlot}"),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                    CupertinoButton(child: const Text("Pay"), onPressed: () => onPay(order)),
-                    CupertinoButton(child: const Text("Cancel"), onPressed: () => onCancel(order)),
-
-                      ],
-                    ),
-                    const Divider(thickness: 3),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      );
-    });
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("My Parties"),
+        content: MyOrdersDialogContent(),
+      ),
+    );
   }
 
   @override
@@ -109,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (state.isSignedIn) {
       var user = state.currentUser!;
       var options = <_ProfileOption>[
-        _ProfileOption("My Orders", onMyOrders),
+        _ProfileOption("My Parties", onMyOrders),
         _ProfileOption("Edit Profile", onEditProfile),
         _ProfileOption("Change Password", onChangePassword),
         _ProfileOption("Fill Waiver", onFillWaiver),
@@ -149,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   const Spacer(),
-                  const Text("Avatar"),
+                  // const Text("Avatar"),
                 ],
               ),
             ),

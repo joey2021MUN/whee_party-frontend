@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whee_party/model/account_model.dart';
 import 'package:whee_party/util/account_util.dart';
-import 'package:whee_party/util/ui_util.dart';
+import 'package:whee_party/util/dialog_util.dart';
+import 'package:whee_party/page/register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,25 +26,23 @@ class _LoginPageState extends State<LoginPage> {
     var password = passwordController.value.text;
 
     if (email.isEmpty) {
-      if (email.isEmpty) {
-        setState(() {
-          _errorTextEmail = "Please enter a valid email address.";
-          _shouldShowErrorTextEmail = true;
-        });
-      }
+      setState(() {
+        _errorTextEmail = "Please enter a valid email address.";
+        _shouldShowErrorTextEmail = true;
+      });
       return;
     }
 
-    UIUtil.showLoadingDialog(context, "Logging in...");
+    DialogUtil.showLoadingDialog(context, "Logging in...");
     setState(() {
       _isLoading = true;
     });
 
     AccountUtil.signIn(email, password).then((result) {
       if (!result["success"]) {
-        UIUtil.updateLoadingDialog(context, result["message"]);
+        DialogUtil.updateLoadingDialog(context, result["message"]);
         Future.delayed(const Duration(seconds: 2), () {
-          UIUtil.closeLoadingDialog(context);
+          DialogUtil.closeLoadingDialog(context);
         });
         setState(() {
           _isLoading = false;
@@ -51,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      UIUtil.closeLoadingDialog(context);
+      DialogUtil.closeLoadingDialog(context);
       setState(() {
         _isLoading = false;
       });
@@ -72,12 +71,10 @@ class _LoginPageState extends State<LoginPage> {
     }).catchError((_) {});
   }
 
-  void _onContinueAsGuestClicked() {
-    Navigator.pop(context);
+  void _onCreateAnAccountClicked() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => const RegisterPage()));
   }
-
-  // Todo
-  void _onCreateAnAccountClicked() {}
 
   void _onShouldRememberMeCheckBoxChanged(bool? newValue) {
     setState(() {
@@ -195,26 +192,6 @@ class _LoginPageState extends State<LoginPage> {
                             margin: const EdgeInsets.fromLTRB(4, 4, 8, 4),
                             child: const Text(
                               "Create Account",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        FilledButton(
-                          onPressed: _onContinueAsGuestClicked,
-                          style: const ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(
-                                Colors.blueGrey),
-                          ),
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: double.infinity,
-                            margin: const EdgeInsets.fromLTRB(4, 4, 8, 4),
-                            child: const Text(
-                              "Continue as Guest",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

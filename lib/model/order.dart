@@ -1,12 +1,14 @@
+import 'package:whee_party/model/payment_status.dart';
+
 class Order {
   final int id;
   final DateTime orderDate;
   final int userId;
-  final bool isUserOrder;
+  final bool cancelled;
   final String reason;
-  final int? paymentId;
   final String timeSlot;
-  final int noteId;
+  final PaymentStatus paymentStatus;
+  final int orderInfoId;
   final int packageId;
   final String packageName;
   final int packagePrice;
@@ -16,11 +18,11 @@ class Order {
     required this.id,
     required this.orderDate,
     required this.userId,
-    required this.isUserOrder,
+    required this.cancelled,
     required this.reason,
-    required this.paymentId,
     required this.timeSlot,
-    required this.noteId,
+    required this.paymentStatus,
+    required this.orderInfoId,
     required this.packageId,
     required this.packageName,
     required this.packagePrice,
@@ -32,15 +34,19 @@ class Order {
       id: obj["id"],
       orderDate: DateTime.parse(obj["order_date"]),
       userId: obj["user_id"],
-      isUserOrder: obj["is_user_order"],
+      cancelled: obj["cancelled"],
       reason: obj["reason"],
-      paymentId: obj["payment_id"],
       timeSlot: obj["time_slot"],
-      noteId: obj["note_id"],
+      paymentStatus: PaymentStatus.fromRawValue(obj["payment_status"]),
+      orderInfoId: obj["order_info_id"],
       packageId: obj["package_id"],
       packageName: obj["package_name"],
       packagePrice: obj["package_price"],
       packageDescription: obj["package_description"],
     );
+  }
+
+  String summary() {
+    return "Order Date: $orderDate\nTime Slot: $timeSlot\nPackage: $packageName\nPackage Price: $packagePrice\nPackage Description: $packageDescription";
   }
 }

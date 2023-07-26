@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../widget/loading_dialog.dart';
 
-class UIUtil {
+class DialogUtil {
   static LoadingDialog? dialog;
 
 static alertDialog(BuildContext context, String content) {

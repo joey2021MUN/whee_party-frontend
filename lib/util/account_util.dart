@@ -32,6 +32,23 @@ class AccountUtil {
         needAuthentication: false);
   }
 
+  static Future<dynamic> signUp({
+    required email,
+    required String fullName,
+    required String phoneNumber,
+    required String password,
+  }) async {
+    password = HashUtil.hash(HashUtil.hash(password));
+    return NetUtil.request("POST", "/user",
+        body: {
+          "email": email,
+          "password": password,
+          "full_name": fullName,
+          "phone_number": phoneNumber
+        },
+        needAuthentication: false);
+  }
+
   static void signOut(BuildContext context) {
     _storage.deleteItem("token");
     _storage.deleteItem("email");

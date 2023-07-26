@@ -6,7 +6,7 @@ import 'package:whee_party/model/slot_availability.dart';
 import 'package:whee_party/page/login_page.dart';
 import 'package:whee_party/util/account_util.dart';
 import 'package:whee_party/util/network_util.dart';
-import 'package:whee_party/util/ui_util.dart';
+import 'package:whee_party/util/dialog_util.dart';
 import 'package:whee_party/widget/toggle_button.dart';
 
 class PartyTimeSlotPage extends StatefulWidget {
@@ -80,23 +80,23 @@ class PartyTimeSlotPageState extends State<PartyTimeSlotPage>
       return;
     }
 
-    UIUtil.showLoadingDialog(context, "Loading...");
+    DialogUtil.showLoadingDialog(context, "Loading...");
 
     NetUtil.request("POST", "/order", body: {
       "date": widget.selectedDate.toIso8601String(),
       "time_slot_id": _selectedSlotIdentifier,
     }, needAuthentication: true).then((value) {
-      UIUtil.updateLoadingDialog(context, value["message"]);
+      DialogUtil.updateLoadingDialog(context, value["message"]);
       _refreshAvailabilities();
       setState(() {
         _selectedSlotIdentifier = -1;
       });
     }).onError((error, stackTrace) {
-      UIUtil.updateLoadingDialog(context, "Network error!");
+      DialogUtil.updateLoadingDialog(context, "Network error!");
     });
 
     Future.delayed(const Duration(seconds: 2), () {
-      UIUtil.closeLoadingDialog(context);
+      DialogUtil.closeLoadingDialog(context);
     });
     /*
     Navigator.push(context,
